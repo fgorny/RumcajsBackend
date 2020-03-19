@@ -67,3 +67,83 @@
         }
     }
 
+//querying DB
+function getUsersPublicKey(dbName, user, callback){
+    let request = indexedDB.open(dbName, 1);
+    request.onerror = event =>{
+        console.log("error connecting to " + dbName + " DB details:\n" + event);
+    }
+    request.onsuccess = event => {
+        db = event.target.result;
+        let transaction = db.transaction("user", "readonly")
+                            .objectStore("user")
+                            .get(user.publicKey)
+                            .onsuccess = event =>{
+            callback(event.target.result.publicKey);
+        }
+    }
+}
+
+function getUsersPrivateKey(dbName, user, callback){
+    let request = indexedDB.open(dbName, 1);
+    request.onerror = event =>{
+        console.log("error connecting to " + dbName + " DB details:\n" + event);
+    }
+    request.onsuccess = event => {
+        db = event.target.result;
+        let transaction = db.transaction("user", "readonly")
+                            .objectStore("user")
+                            .get(user.publicKey)
+                            .onsuccess = event =>{
+            callback(event.target.result.privateKey);
+        }
+    }
+}
+
+function getUsersIpAddress(dbName, user, callback){
+    let request = indexedDB.open(dbName, 1);
+    request.onerror = event =>{
+        console.log("error connecting to " + dbName + " DB details:\n" + event);
+    }
+    request.onsuccess = event => {
+        db = event.target.result;
+        let transaction = db.transaction("user", "readonly")
+                            .objectStore("user")
+                            .get(user.publicKey)
+                            .onsuccess = event =>{
+            callback(event.target.result.ipAddress);
+        }
+    }
+}
+
+function getUsersAlPortNumber(dbName, user, callback){
+    let request = indexedDB.open(dbName, 1);
+    request.onerror = event =>{
+        console.log("error connecting to " + dbName + " DB details:\n" + event);
+    }
+    request.onsuccess = event => {
+        db = event.target.result;
+        let transaction = db.transaction("user", "readonly")
+                            .objectStore("user")
+                            .get(user.publicKey)
+                            .onsuccess = event =>{
+            callback(event.target.result.AlPort);
+        }
+    }
+}
+
+function getMessagessWithFriend(dbName, friendsPublicKey, callback){
+    let request = indexedDB.open(dbName, 1);
+    request.onerror = event =>{
+        console.log("error connecting to " + dbName + " DB details:\n" + event);
+    }
+    request.onsuccess = event => {
+        db = event.target.result;
+        let transaction = db.transaction("friends", "readonly")
+                            .objectStore("friends")
+                            .get(friendsPublicKey)
+                            .onsuccess = event =>{
+            callback(event.target.result.messagesList);
+        }
+    }
+}
