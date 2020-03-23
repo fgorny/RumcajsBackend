@@ -24,7 +24,12 @@
     //     await addNewFriend(ania);
     //     console.log("gitówa")
     // })();
-    setUpDb().then(() => addMessage(ania, message));
+    // setUpDb().then(() => addMessage(ania, message));
+    (async ()=>{
+        await setUpDb();
+        let pb = await getMessagessWithFriend(ania);
+        console.log(pb);
+    })();
 </script>
 
 

@@ -39,6 +39,17 @@
             }
         });
     }
+    function addNewUser(user){
+        return new Promise((resolve, reject) =>{
+            let tx = db.transaction("user", 'readwrite');
+            let store = tx.objectStore("user");
+            store.add(user);
+            tx.oncomplete = resolve();
+            tx.onerror = error =>{
+                reject('error storing friend' + error.target.errorCode);
+            }
+        });
+    }
     function addMessage(friend, message){
         return new Promise((resolve, reject) =>{
             let tx = db.transaction('friends', 'readwrite');
@@ -58,4 +69,64 @@
     }
 
 
-    //module.exports = createDb;
+    //Quering DB
+    function getUserPublicKey(user){
+        return new Promise((resolve, reject) =>{
+            let tx = db.transaction("user", "readonly")
+            let store = tx.objectStore("user");
+            let getReq = store.get(user.publicKey);
+            getReq.onsuccess = event =>{
+                let data = event.target.result.publicKey;
+                resolve(data);
+            }
+        });
+    }
+    
+    function getUserPrivateKey(user){
+        return new Promise((resolve, reject) =>{
+            let tx = db.transaction("user", "readonly")
+            let store = tx.objectStore("user");
+            let getReq = store.get(user.publicKey);
+            getReq.onsuccess = event =>{
+                let data = event.target.result.privateKey;
+                resolve(data);
+            }
+        });
+    }
+    
+    function getUserIpAddress(user){
+        return new Promise((resolve, reject) =>{
+            let tx = db.transaction("user", "readonly")
+            let store = tx.objectStore("user");
+            let getReq = store.get(user.publicKey);
+            getReq.onsuccess = event =>{
+                let data = event.target.result.ipAddress;
+                resolve(data);
+            }
+        });
+    }
+    
+    function getUserAlPortNumber(user){
+        return new Promise((resolve, reject) =>{
+            let tx = db.transaction("user", "readonly")
+            let store = tx.objectStore("user");
+            let getReq = store.get(user.publicKey);
+            getReq.onsuccess = event =>{
+                let data = event.target.result.AlPort;
+                resolve(data);
+            }
+        });
+    }
+
+
+    function getMessagessWithFriend(friend){
+        return new Promise((resolve, reject) =>{
+            let tx = db.transaction("friends", "readonly")
+            let store = tx.objectStore("friends");
+            let getReq = store.get(friend.publicKey);
+            getReq.onsuccess = event =>{
+                let data = event.target.result.messagesList;
+                resolve(data);
+            }
+        });
+    }
