@@ -8,11 +8,10 @@
 </head>
 
 <script>
-    const dbName = "rumcajsDb";
     let kuba = new User(123, "1.2.3", 321);
     let ania = new Friend("Ania", 456, "4.5.6");
-    // let message = new Message(kuba, ania, "heeej");
-    // ania.messagesList.push(message);
+    let message = new Message(kuba, ania, "ct");
+    ania.messagesList.push(message);
     // let jan = new Friend("Jan", 789, "4.5.5");
     // let message = new Message(kuba, jan, "elo");
     // jan.messagesList.push(message);
@@ -20,13 +19,12 @@
     // message = new Message(kuba, mike, "fuck u");
     // mike.messagesList.push(message);
 
-    // getKey(kuba);
-    // a = 5;
-    // getMessagessWithFriend(dbName, ania.publicKey, console.log);
-    
-
-    getUsersPrivateKey(dbName, kuba, console.log);
-       
+    // (async ()=>{
+    //     await setUpDb();
+    //     await addNewFriend(ania);
+    //     console.log("gitówa")
+    // })();
+    setUpDb().then(() => addMessage(ania, message));
 </script>
 
 

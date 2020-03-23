@@ -4,66 +4,58 @@
         }
     }
 
-    function createDb(dbName, user, friends){
-        let request = indexedDB.open(dbName, 1);
-        request.onerror = event =>{
-            console.log("error connecting to " + dbName + " DB details:\n" + event);
-        }
-        request.onupgradeneeded = event =>{
-            let db = event.target.result;
-            let userObjectStore = db.createObjectStore("user", { keyPath: "publicKey" });
-            let friendsObjectStore = db.createObjectStore("friends", { keyPath: "publicKey" });  
-            userObjectStore.transaction.oncomplete = function(event) {
-                let userObjectStore = db.transaction("user", "readwrite").objectStore("user");
-                    userObjectStore.add(user);
-                let friendsObjectStore = db.transaction("friends", "readwrite").objectStore("friends");
-                if(Array.isArray(friends)){
-                    friends.forEach(friend =>{
-                        friendsObjectStore.add(friend);
-                    });
-                }
-                else
-                    friendsObjectStore.add(friends);
-            };
-        }
+    let db;
+    function setUpDb(){
+        return new Promise((resolve, reject) => {
+            if(db){
+                resolve();
+                return;
+            }
+            let dbreq = indexedDB.open('rumcajsDb', 1);
+            dbreq.onupgradeneeded = event =>{
+                db = event.target.result;
+                let userObjectStore = db.createObjectStore("user", { keyPath: "publicKey" });
+                let friendsObjectStore = db.createObjectStore("friends", { keyPath: "publicKey" });  
+            }
+            dbreq.onsuccess = event =>{
+                db = event.target.result;
+                resolve();
+            }
+            dbreq.onerror = event =>{
+                reject("error connecting to rumcajsDb" + " DB details:\n" + event);
+            }
+        });
     }
 
     //Update DB
-    function addNewFriend(dbName, friend){
-        let request = indexedDB.open(dbName, 1);
-        request.onerror = event =>{
-            console.log("error connecting to " + dbName + " DB details:\n" + event);
-        }
-        request.onsuccess = event =>{
-            db = event.target.result;
-            
-            let transaction = db.transaction("friends", "readwrite")
-            let objectStore = transaction.objectStore("friends");
-            objectStore.add(friend);
-        }
+    function addNewFriend(friend){
+        return new Promise((resolve, reject) =>{
+            let tx = db.transaction("friends", 'readwrite');
+            let store = tx.objectStore("friends");
+            store.add(friend);
+            tx.oncomplete = resolve();
+            tx.onerror = error =>{
+                reject('error storing friend' + error.target.errorCode);
+            }
+        });
     }
-    function addMessage(dbName, friend, message){
-        let request = indexedDB.open(dbName, 1);
-        request.onerror = event =>{
-            console.log("error connecting to " + dbName + " DB details:\n" + event);
-        }
-        request.onsuccess = event =>{
-            db = event.target.result;
-            
-            let transaction = db.transaction("friends", "readwrite")   
-            let objectStore = transaction.objectStore("friends");
-            let request = objectStore.get(friend.publicKey);
-            request.onsuccess = event =>{
-                let data = request.target.result;
-                data.messagesList.push(message);
-                let requestUpdate = objectStore.put(data);
-                requestUpdate.onsuccess = event => {
-                    console.log("Message added");
-                }
-                requestUpdate.onerror = event =>{
-                    console.log("Error adding message");
+    function addMessage(friend, message){
+        return new Promise((resolve, reject) =>{
+            let tx = db.transaction('friends', 'readwrite');
+            let store = tx.objectStore('friends');
+            let getReq = store.get(friend.publicKey);
+            getReq.onsuccess = event =>{
+                let friend = event.target.result;
+                friend.messagesList.push(message);
+                let updateReq = store.put(friend);
+                updateReq.onerror = error =>{
+                    console.error('error adding message' + error.target.errorCode);
                 }
             }
-        }
+            tx.oncomplete = resolve();
+            tx.onerror = reject();
+        });
     }
 
+
+    //module.exports = createDb;
