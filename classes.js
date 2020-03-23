@@ -1,11 +1,12 @@
 
 class User
 {
-    constructor(publicKey, ipAddress, privateKey, AlPort){
+    constructor(publicKey, ipAddress, privateKey, AlPort, nick){
         this.publicKey = publicKey;
         this.privateKey = privateKey;
         this.ipAddress = ipAddress;
         this.AlPort = AlPort;
+        this.nick = nick;
     }
 }
 class Friend

@@ -14,8 +14,11 @@
             let dbreq = indexedDB.open('rumcajsDb', 1);
             dbreq.onupgradeneeded = event =>{
                 db = event.target.result;
-                let userObjectStore = db.createObjectStore("user", { keyPath: "publicKey" });
-                let friendsObjectStore = db.createObjectStore("friends", { keyPath: "publicKey" });  
+                let userObjectStore = db.createObjectStore("user", { keyPath: "id", autoIncrement: true });
+                userObjectStore.createIndex('publicKey','publicKey', {unique: true});
+                let friendsObjectStore = db.createObjectStore("friends", { keyPath: "id", autoIncrement: true }); 
+                friendsObjectStore.createIndex('publicKey','publicKey', {unique: true});
+ 
             }
             dbreq.onsuccess = event =>{
                 db = event.target.result;
@@ -68,13 +71,38 @@
         });
     }
 
+    //Query db
+    function getUser(){
+        return new Promise((resolve, reject) =>{
+            let tx = db.transaction("user", "readonly")
+            let store = tx.objectStore("user");
+            let getReq = store.get(1);
+            getReq.onsuccess = event =>{
+                let user = event.target.result;
+                resolve(user);
+            }
+        });
+    }
+    
+    function getUserPrivateKey(friend){
+        return new Promise((resolve, reject) =>{
+            let tx = db.transaction("user", "readonly")
+            let store = tx.objectStore("user");
+            let index = store.index('publicKey');
+            let getReq = index.get(friend.publicKey)
+            getReq.onsuccess = event =>{
+                let data = event.target.result.privateKey;
+                resolve(data);
+            }
+        });
+    }
 
-    //Quering DB
+    //Quering user's info
     function getUserPublicKey(user){
         return new Promise((resolve, reject) =>{
             let tx = db.transaction("user", "readonly")
             let store = tx.objectStore("user");
-            let getReq = store.get(user.publicKey);
+            let getReq = store.get(1);
             getReq.onsuccess = event =>{
                 let data = event.target.result.publicKey;
                 resolve(data);
@@ -86,7 +114,8 @@
         return new Promise((resolve, reject) =>{
             let tx = db.transaction("user", "readonly")
             let store = tx.objectStore("user");
-            let getReq = store.get(user.publicKey);
+            let index = store.index('publicKey');
+            let getReq = index.get(user.publicKey);
             getReq.onsuccess = event =>{
                 let data = event.target.result.privateKey;
                 resolve(data);
