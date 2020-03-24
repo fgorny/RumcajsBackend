@@ -84,14 +84,14 @@
         });
     }
     
-    function getUserPrivateKey(friend){
+    function getFriend(friendsPublicKey){
         return new Promise((resolve, reject) =>{
-            let tx = db.transaction("user", "readonly")
-            let store = tx.objectStore("user");
+            let tx = db.transaction("friends", "readonly")
+            let store = tx.objectStore("friends");
             let index = store.index('publicKey');
-            let getReq = index.get(friend.publicKey)
+            let getReq = index.get(friendsPublicKey)
             getReq.onsuccess = event =>{
-                let data = event.target.result.privateKey;
+                let data = event.target.result;
                 resolve(data);
             }
         });

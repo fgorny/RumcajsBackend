@@ -27,9 +27,9 @@
     // setUpDb().then(() => addMessage(ania, message));
     (async ()=>{
         await setUpDb();
-        await addNewFriend(ania);
-        await addNewUser(kuba);
-        let user = await getUser();
+        // await addNewFriend(ania);
+        // await addNewUser(kuba);
+        let user = await getFriend(ania.publicKey);
         console.log(user);
     })();
 </script>
